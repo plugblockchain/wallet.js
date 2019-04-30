@@ -1,0 +1,37 @@
+{
+  "name": "root",
+  "private": true,
+  "engines": {
+    "node": "^10.13.0",
+    "yarn": "^1.12.3"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "plugnet-dev-build-ts && copyfiles -u1 \"./build/**/*.d.ts\" ./packages/wallet/build/",
+    "test": "jest -c ./jest/jest.config.js --coverage spec",
+    "make-docs": "typedoc --options typedoc.config.js ."
+  },
+  "devDependencies": {
+    "@plugnet/dev": "^0.30.3",
+    "@types/jest": "^23.3.10",
+    "husky": "^1.1.1",
+    "jest": "24.1.0",
+    "jest-environment-node": "^24.0.0",
+    "lerna": "^3.13.1",
+    "prettier": "^1.13.5",
+    "ts-jest": "^24.0.0",
+    "ts-node": "^8.0.3",
+    "tsconfig-paths": "^3.8.0",
+    "tslint": "^5.14.0",
+    "tslint-microsoft-contrib": "^5.2.1",
+    "typedoc": "^0.14.2",
+    "typedoc-plugin-monorepo": "https://github.com/ianhe8x/typedoc-plugin-monorepo"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "prettier --write 'packages/**/src/**/*'"
+    }
+  }
+}

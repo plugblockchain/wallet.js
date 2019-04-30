@@ -1,0 +1,39 @@
+{
+    "name": "@plugnet/wallet",
+    "version": "0.11.4",
+    "description": "wallet implementation for Plugnet",
+    "author": "ian.he <ian.he@centrality.ai>",
+    "homepage": "https://github.com/plugblockchain/wallet.js#readme",
+    "license": "Apache-2.0",
+    "keywords": [
+        "Plugnet",
+        "wallet"
+    ],
+    "main": "index.js",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com:plugblockchain/wallet.js.git"
+    },
+    "scripts": {
+        "test": "jest --coverage -c ../../jest/jest.config.js",
+        "test:unit": "jest --coverage -c ../../jest/jest.config.js spec",
+        "test:watch": "jest --watch -c ../../jest/jest.config.js",
+        "doc": "npx compodoc --tsconfig ../../tsconfig.json --hideGenerator --theme readthedocs  --includes compodoc --output ../../docs/wallet"
+    },
+    "dependencies": {
+        "@plugnet/util": "^0.76.2-beta.0",
+        "bip39": "^2.5.0",
+        "hdkey": "^1.1.0",
+        "reflect-metadata": "^0.1.12",
+        "tweetnacl": "^1.0.0"
+    },
+    "devDependencies": {
+        "@plugnet/api": "^0.76.102",
+        "@plugnet/types": "^0.76.102",
+        "@types/jest": "^23.3.5",
+        "jest": "24.1.0",
+        "rimraf": "^2.6.2",
+        "typescript": "^3.4.5"
+    }
+}

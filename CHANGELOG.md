@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.20.0 (2019-04-29)
+
+### Dependencies
+
+* drop dependencies of `@plugnet/api` and `@plugnet/types`
+
+### BREAKING CHANGES
+
+* drop `wallet.sign()`, now it's a raw signer, `async signRaw(payload: SignerPayloadRaw): Promise<SignerResult>`  
+
 ## [0.11.2](https://bitbucket.org/centralitydev/cennznet-js/compare/v0.11.1...v0.11.2) (2019-04-29)
 
 **Note:** Version bump only for package @cennznet/wallet

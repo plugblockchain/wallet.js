@@ -1,6 +1,6 @@
 {
     "name": "@plugnet/wallet",
-    "version": "0.11.4",
+    "version": "0.20.0",
     "description": "wallet implementation for Plugnet",
     "author": "ian.he <ian.he@centrality.ai>",
     "homepage": "https://github.com/plugblockchain/wallet.js#readme",

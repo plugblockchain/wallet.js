@@ -9,29 +9,25 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "plugnet-dev-build-ts && copyfiles -u1 \"./build/**/*.d.ts\" ./packages/wallet/build/",
+    "build": "plugnet-dev-build-ts",
     "test": "jest -c ./jest/jest.config.js --coverage spec",
-    "make-docs": "typedoc --options typedoc.config.js ."
+    "lint": "npx tslint -c tslint.json --project . && npx prettier --list-different './packages/**/src/*.ts'"
   },
   "devDependencies": {
-    "@plugnet/dev": "^0.30.3",
-    "@types/jest": "^23.3.10",
-    "husky": "^1.1.1",
-    "jest": "24.1.0",
+    "@plugnet/dev": "^0.31.0",
+    "@types/jest": "^24.0.15",
+    "cz-lerna-changelog": "^2.0.2",
+    "husky": "^2.7.0",
+    "jest": "24.8.0",
     "jest-environment-node": "^24.0.0",
     "lerna": "^3.13.1",
     "prettier": "^1.13.5",
-    "ts-jest": "^24.0.0",
-    "ts-node": "^8.0.3",
-    "tsconfig-paths": "^3.8.0",
-    "tslint": "^5.14.0",
-    "tslint-microsoft-contrib": "^5.2.1",
-    "typedoc": "^0.14.2",
-    "typedoc-plugin-monorepo": "https://github.com/ianhe8x/typedoc-plugin-monorepo"
+    "pretty-quick": "^1.11.1",
+    "tslint": "^5.14.0"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "prettier --write 'packages/**/src/**/*'"
+      "pre-commit": "pretty-quick --staged --pattern 'packages/**/src/**/*' && npx tslint -c tslint.json --project ."
     }
   }
 }

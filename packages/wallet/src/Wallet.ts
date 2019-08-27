@@ -1,17 +1,33 @@
 // Copyright 2019 Centrality Investments Limited
-// Licensed under the Apache license, Version 2.0 (the "license"); you may not use this file except in compliance with the license.
-// You may obtain a copy of the license at http://www.apache.org/licences/LICENCE-2.0.
-// Unless required by applicable law or agreed to in writing, software distributed under the licence is distributed on an "AS IS" BASIS,  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the licence for the specific language governing permissions and limitations under the licence.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-import {Signer} from '@plugnet/api/types';
 import {KeyringPair$Json} from '@plugnet/keyring/types';
-import {IExtrinsic, SignatureOptions} from '@plugnet/types/types';
-
-import {persistBeforeReturn, requireUnlocked, synchronized} from './decorators';
+import {hexToU8a, u8aToHex, u8aToU8a} from '@plugnet/util';
+import {persistBeforeReturn, requireUnlocked, synchronized, waitForCryptoReady} from './decorators';
 import naclEncryptor from './encryptors/naclEncryptor';
 import {HDKeyring} from './keyrings/HDKeyring';
-import {Encryptor, IKeyring, IWallet, KeyringType, WalletOption} from './types';
+import {
+    AnyU8a,
+    Encryptor,
+    IKeyring,
+    IWallet,
+    KeyringType,
+    RawPayloadSigner,
+    SignerPayloadRaw,
+    SignerResult,
+    WalletOption,
+} from './types';
 
 export type SerializedWallet = {name: string; data: any}[];
 
@@ -46,10 +62,10 @@ function getKeyringByAddress(wallet: Wallet, accountKeyringMap: AccountKeyringMa
 }
 
 /**
- * a Wallet implementation which can be used as signer in @plugnet/api
+ * a Wallet implementation which can be used as signer in cennznet-api
  * support multi-keyring and shipped with a HD Keyring as default keyring type.
  */
-export class Wallet implements Signer, IWallet {
+export class Wallet implements RawPayloadSigner, IWallet {
     vault: string;
     protected _encryptor: Encryptor;
     protected _keyringTypes: KeyringType<any>[];
@@ -72,20 +88,39 @@ export class Wallet implements Signer, IWallet {
     }
 
     /**
-     * sign a extrinsic using the account specified by opt.from
-     * @param extrinsic
-     * @param opt
+     * sign a raw payload
+     * @param payload
      * @requires wallet unlocked
-     * @throws when the account(opt.from) is not managed by the wallet.
+     * @throws when the account is not managed by the wallet.
      */
     @synchronized
     @requireUnlocked
-    async sign(extrinsic: IExtrinsic, address: string, options: SignatureOptions): Promise<number> {
+    @waitForCryptoReady
+    async signRaw(payload: SignerPayloadRaw): Promise<SignerResult> {
+        const {address, data} = payload;
         const signerPair = await getKeyringByAddress(this, this._accountKeyringMap, address).getPair(address);
+        const signature = u8aToHex(signerPair.sign(hexToU8a(data)));
 
-        extrinsic.sign(signerPair, {blockHash: options.blockHash, nonce: options.nonce});
+        return {
+            id: ++id,
+            signature,
+        };
+    }
 
-        return ++id;
+    /**
+     * verify a signature using nacl or schnorrkel deps on keyring type
+     * @param message
+     * @param signature
+     * @param address
+     * @requires wallet unlocked
+     * @throws when the account is not managed by the wallet.
+     */
+    @synchronized
+    @requireUnlocked
+    @waitForCryptoReady
+    async verifySignature(message: AnyU8a, signature: AnyU8a, address: string): Promise<boolean> {
+        const signerPair = await getKeyringByAddress(this, this._accountKeyringMap, address).getPair(address);
+        return signerPair.verify(u8aToU8a(message), u8aToU8a(signature));
     }
 
     /**
@@ -93,9 +128,10 @@ export class Wallet implements Signer, IWallet {
      * @param passphrase for the new created wallet.
      */
     @synchronized
-    async createNewVault(passphrase: string): Promise<void> {
+    @waitForCryptoReady
+    async createNewVault(passphrase: string, opt?: any): Promise<void> {
         privatePasswd.set(this, passphrase);
-        privateKeyrings.set(this, [await this.defaultKeyringType.generate()]);
+        privateKeyrings.set(this, [await this.defaultKeyringType.generate(opt)]);
         this._isLocked = false;
         await this.persistAll();
     }
@@ -105,6 +141,7 @@ export class Wallet implements Signer, IWallet {
      * @param passphrase for the new created wallet.
      */
     @synchronized
+    @waitForCryptoReady
     async createNewVaultAndRestore(passphrase: string, keyrings: IKeyring<any>[]): Promise<void> {
         privatePasswd.set(this, passphrase);
         privateKeyrings.set(this, keyrings);
@@ -198,10 +235,11 @@ export class Wallet implements Signer, IWallet {
     @synchronized
     @requireUnlocked
     @persistBeforeReturn
+    @waitForCryptoReady
     async addAccount(): Promise<string> {
         const defaultKeyring = getDefaultKeyring(this);
         const kp = await defaultKeyring.addPair();
-        return kp.address();
+        return kp.address;
     }
 
     /**

@@ -1,11 +1,19 @@
 // Copyright 2019 Centrality Investments Limited
-// Licensed under the Apache license, Version 2.0 (the "license"); you may not use this file except in compliance with the license.
-// You may obtain a copy of the license at http://www.apache.org/licences/LICENCE-2.0.
-// Unless required by applicable law or agreed to in writing, software distributed under the licence is distributed on an "AS IS" BASIS,  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the licence for the specific language governing permissions and limitations under the licence.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 import {KeyringPair} from '@plugnet/keyring/types';
-import {waitReady as cryptoWaitReady} from '@plugnet/wasm-crypto';
+import {cryptoWaitReady} from '@plugnet/util-crypto';
 import {HDKeyring} from './HDKeyring';
 import {IKeyring} from '../types';
 
@@ -30,7 +38,7 @@ describe('HDKeyring', () => {
 
         it('removePair(address) not support', async () => {
             const kp = keyPairs[0];
-            await expect(keyring.removePair(kp.address())).rejects.toThrow("doesn't support removePair");
+            await expect(keyring.removePair(kp.address)).rejects.toThrow("doesn't support removePair");
         });
     });
 
@@ -42,9 +50,10 @@ describe('HDKeyring', () => {
     it('recover from mnemonic', async () => {
         const keyring = new HDKeyring({
             mnemonic: 'urban tuna work fiber excuse gown adult grab winner rigid lamp appear',
+            hdPath: "m/44'/392'/0'/0",
         });
         await expect(keyring.getAddresses()).resolves.toHaveLength(0);
         const kp = await keyring.addPair();
-        expect(kp.address()).toBe('5CLYG6kwn9cUnDvSnKRorrZDKje6P3Vy724QxujPoue13rSy');
+        expect(kp.address).toBe('5HTkvBrPpfrSZCoHE9qBMyNmV2JVJcKLNswwXvWdZjizCMHj');
     });
 });

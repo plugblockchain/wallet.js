@@ -1,11 +1,19 @@
 // Copyright 2019 Centrality Investments Limited
-// Licensed under the Apache license, Version 2.0 (the "license"); you may not use this file except in compliance with the license.
-// You may obtain a copy of the license at http://www.apache.org/licences/LICENCE-2.0.
-// Unless required by applicable law or agreed to in writing, software distributed under the licence is distributed on an "AS IS" BASIS,  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the licence for the specific language governing permissions and limitations under the licence.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
+import {cryptoWaitReady} from '@plugnet/util-crypto';
 import {KeyringPair} from '@plugnet/keyring/types';
-import {waitReady as cryptoWaitReady} from '@plugnet/wasm-crypto';
 import {IKeyring, KeyringType} from '../types';
 import {HDKeyring} from './HDKeyring';
 import {SimpleKeyring} from './SimpleKeyring';
@@ -61,7 +69,7 @@ describe('buildin keyrings', () => {
                     expect(Array.from(new Set(addresses))).toHaveLength(times);
                     let match = 0;
                     keyPairs.forEach(kp => {
-                        if (addresses.includes(kp.address())) {
+                        if (addresses.includes(kp.address)) {
                             match += 1;
                         }
                     });
@@ -71,13 +79,13 @@ describe('buildin keyrings', () => {
                 it('getPairs()', async () => {
                     const pairs = await keyring.getPairs();
                     pairs.forEach(pair => {
-                        expect(pair.isLocked()).toBeFalsy();
+                        expect(pair.isLocked).toBeFalsy();
                     });
-                    const addresses = pairs.map(pair => pair.address());
+                    const addresses = pairs.map(pair => pair.address);
                     expect(Array.from(new Set(addresses))).toHaveLength(times);
                     let match = 0;
                     keyPairs.forEach(kp => {
-                        if (addresses.includes(kp.address())) {
+                        if (addresses.includes(kp.address)) {
                             match += 1;
                         }
                     });
@@ -86,8 +94,8 @@ describe('buildin keyrings', () => {
 
                 it('getPair(address)', async () => {
                     for (const kp of keyPairs) {
-                        const pair = await keyring.getPair(kp.address());
-                        expect(pair.address()).toBe(kp.address());
+                        const pair = await keyring.getPair(kp.address);
+                        expect(pair.address).toBe(kp.address);
                     }
                 });
 
@@ -98,8 +106,8 @@ describe('buildin keyrings', () => {
                 if (KeyringType.name !== 'HDKeyring') {
                     it('removePair(address) success', async () => {
                         for (const kp of keyPairs) {
-                            await keyring.removePair(kp.address());
-                            await expect(keyring.getPair(kp.address())).rejects.toThrow();
+                            await keyring.removePair(kp.address);
+                            await expect(keyring.getPair(kp.address)).rejects.toThrow();
                         }
                         await expect(keyring.getAddresses()).resolves.toHaveLength(0);
                     });
@@ -114,7 +122,7 @@ describe('buildin keyrings', () => {
                     expect(serialized).not.toBeUndefined();
                     const newKeyring = new KeyringType();
                     await expect(newKeyring.deserialize(serialized)).resolves.toBe(newKeyring);
-                    await expect(newKeyring.getAddresses()).resolves.toEqual(keyPairs.map(kp => kp.address()));
+                    await expect(newKeyring.getAddresses()).resolves.toEqual(keyPairs.map(kp => kp.address));
                 });
             });
         });

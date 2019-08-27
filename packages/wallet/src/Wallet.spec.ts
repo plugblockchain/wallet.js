@@ -1,20 +1,27 @@
 // Copyright 2019 Centrality Investments Limited
-// Licensed under the Apache license, Version 2.0 (the "license"); you may not use this file except in compliance with the license.
-// You may obtain a copy of the license at http://www.apache.org/licences/LICENCE-2.0.
-// Unless required by applicable law or agreed to in writing, software distributed under the licence is distributed on an "AS IS" BASIS,  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the licence for the specific language governing permissions and limitations under the licence.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-import extrinsics from '@plugnet/extrinsics/static';
-import TestingPairs from '@plugnet/keyring/testingPairs';
-import {Extrinsic, Method} from '@plugnet/types';
 import {hexToU8a} from '@plugnet/util';
-import {waitReady as cryptoWaitReady} from '@plugnet/wasm-crypto';
-
+import {cryptoWaitReady} from '@plugnet/util-crypto';
+import TestingPairs from '@plugnet/keyring/testingPairs';
+import {SignerPayloadRaw} from '@plugnet/wallet/types';
 import {Wallet} from './';
 import {HDKeyring} from './keyrings/HDKeyring';
 import {SimpleKeyring} from './keyrings/SimpleKeyring';
 
 const TESTING_PAIRS = TestingPairs();
+const DEFAULT_HD_PATH = "m/44'/392'/0'/0";
 
 const TEST_ACCOUNT = {
     seed: '0x3cf2ec6ffd26587529ab06c82ba9b33110198085f5c6b8d882653d056bf9e0d3',
@@ -25,29 +32,31 @@ const TEST_ACCOUNT = {
 
 const GENESIS_HASH = '0x14ba3ad1bf42740e82a408d57955b0c026bfc268ee559ce9081ba7fb530de815';
 
+const testPayload = (address: string): SignerPayloadRaw => ({
+    data: '0x010200ea51b75b00000000',
+    type: 'payload',
+    address,
+});
+
 describe('a wallet', () => {
     let wallet: Wallet;
-    let testExtrinsic: Extrinsic;
     const alice = TESTING_PAIRS.alice;
     const bob = TESTING_PAIRS.bob;
     const walletPassphase = 'a test wallet passphase';
 
     beforeAll(async () => {
-        HDKeyring.DEFAULT_HD_PATH = "m/44'/392'/0'/0";
-        Method.injectMethods(extrinsics);
         await cryptoWaitReady();
     });
 
     beforeEach(async () => {
         wallet = new Wallet();
         await wallet.createNewVault(walletPassphase);
-        testExtrinsic = new Extrinsic('0x010200ea51b75b00000000');
     });
 
     it('create and restore', async () => {
         const newPassphrase = 'new passphrase';
         const mnemonic = 'kite manual pizza regret forget edge jelly leaf draft arrest knock parade';
-        const keyring = new HDKeyring({mnemonic});
+        const keyring = new HDKeyring({mnemonic, hdPath: DEFAULT_HD_PATH});
         await wallet.createNewVaultAndRestore(newPassphrase, [keyring]);
         await expect(wallet.addAccount()).resolves.toBe('5CzSXa5da4KdaPgEhDNShUAjP3fcdGdXPpenrm8zv54HG7C3');
     });
@@ -55,9 +64,16 @@ describe('a wallet', () => {
     it('create and restore#2', async () => {
         const newPassphrase = 'new passphrase';
         const mnemonic = 'kite manual pizza regret forget edge jelly leaf draft arrest knock parade';
-        const keyring = new HDKeyring({mnemonic, numberOfAccounts: 5});
+        const keyring = new HDKeyring({mnemonic, numberOfAccounts: 5, hdPath: DEFAULT_HD_PATH});
         await wallet.createNewVaultAndRestore(newPassphrase, [keyring]);
         await expect(wallet.getAddresses()).resolves.toHaveLength(5);
+    });
+
+    it('create with custom word counts', async () => {
+        const wallet = new Wallet();
+        await wallet.createNewVault(walletPassphase, {words: 24});
+        const walletExport = await wallet.export(walletPassphase);
+        expect(walletExport[0].data.mnemonic.split(' ').length).toBe(24);
     });
 
     describe('accounts', () => {
@@ -65,7 +81,7 @@ describe('a wallet', () => {
             const keyring = new SimpleKeyring();
             await keyring.addPair(alice);
             await wallet.addKeyring(keyring);
-            await expect(wallet.getAddresses()).resolves.toEqual(expect.arrayContaining([alice.address()]));
+            await expect(wallet.getAddresses()).resolves.toEqual(expect.arrayContaining([alice.address]));
         });
 
         it('remove removeAccount', async () => {
@@ -74,8 +90,8 @@ describe('a wallet', () => {
             await keyring.addPair(alice);
             await keyring.addPair(bob);
             await wallet.addKeyring(keyring);
-            await wallet.removeAccount(alice.address());
-            await expect(wallet.getAddresses()).resolves.toEqual(expect.not.arrayContaining([alice.address()]));
+            await wallet.removeAccount(alice.address);
+            await expect(wallet.getAddresses()).resolves.toEqual(expect.not.arrayContaining([alice.address]));
         });
 
         it('throw error when trying to add keyring with duplicate accounts', async () => {
@@ -84,7 +100,7 @@ describe('a wallet', () => {
             [] = [await keyring.addPair(alice), await keyring2.addPair(alice)];
             await wallet.addKeyring(keyring);
             await expect(wallet.addKeyring(keyring2)).rejects.toThrow();
-            await wallet.removeAccount(alice.address());
+            await wallet.removeAccount(alice.address);
             await wallet.addKeyring(keyring2);
         });
 
@@ -98,7 +114,7 @@ describe('a wallet', () => {
             };
             // keyring#0 is hdkeyring with 1 account(account0) and account1 is the next account
             const vault =
-                '0x9f8d20b8b5e82ebc4a37a004e7dc0bdfce2176a4a0f2b8987c14261099766dda118ef4f7532521536cca69420a70fd3dd42f19fd239954c05ccdfb730566f47eadafae012680dec565e4ced5e01393aeb04c234354bf79697014c7f57b37eb3416b7ae0be7d06856734ed5bb33ab5bf32d0e4ecb8430b6654de7d006f922e479fdcb148015f56d3184ca6b80f30b778c5afb79620ebf59ea9e82d39b90c5a57ba8248d8f9024e655d156040144e21c';
+                '0x574e6ec7eaa0ba4e8404a6127c7d8e7d665f51d2d048bc6848d556145bd5c960bb2dd0823f1cde6f821b56579be9f9cbdf9baaf8c5ad790ad30f3aa6bf8715f4585406c7a93108d28bec4137926aa6df7446b6f9baace6fdbab06a4d72a83da267b66415d1b0916581fb35934538d6443e93430e792f7f54791d412231858c008929ce64cbbe9e84906bd0124694899aa6de715cb2f2d8e387d6484ac37ac8e23a8523ee326629bd6921b02009fab5dfab2bf686e9b7fde5ffe12c4a3b523529d9e7855dea03d93b004a60977f41bf83a60c890caef324ac21efa642cebbcc22fe3e';
             const wallet = new Wallet({vault});
             await wallet.unlock(null);
             await expect(wallet.getAddresses()).resolves.toEqual(expect.arrayContaining([account0.address]));
@@ -155,27 +171,23 @@ describe('a wallet', () => {
                 '0xbf44f9de75ae49c510ff145374d82352e9271c1e648d65c276e525cb95326f915b7e724758c955822435476061e0a5cad87075d693e60c61cc617b6f04949a99cfffa2b881048e5e03a6701480004614c14a037e2ab01a41b3776d6f1cc1a7578a0bc8eb5c5e9070181633b62b48430be4cf8ca9c4e8304c850029751f919f865b1e3dadf7a6e619cd57dd5c5c958c0c3ea928aa0d6993995cd725520a1df81526f6989d716f0a3fb07e48e4dbf73c59e6d849279a50198b50cf25046d24c663d4b6664a0040e91554aebfd1c8b1219533320c0cb8b90b99041eb3cf6e4a3165f5c01145d4579191aae066b7cf600493f783a2d89158f4bc415172d231b5f35940c9ff00ead6e924eed7c464934f105244a071367d53440745a1b066a7ecea37035c428d29bb08d25186e7ce86';
             const wallet = new Wallet({vault});
             await expect(wallet.unlock('test')).rejects.toThrow('keyring type SimpleKeyring not found');
-            const wallet2 = new Wallet({vault, keyringTypes: [SimpleKeyring, HDKeyring]});
+            const wallet2 = new Wallet({
+                vault,
+                keyringTypes: [SimpleKeyring, HDKeyring],
+            });
             await wallet2.unlock('test');
         });
     });
 
-    describe('sign message', () => {
+    describe('sign raw message', () => {
         it('the signer is managed by the wallet', async () => {
             const keyring = new SimpleKeyring();
             await keyring.addPair(alice);
             await wallet.addKeyring(keyring);
-            await wallet.sign(testExtrinsic, alice.address(), {nonce: 0, blockHash: GENESIS_HASH});
-            expect(testExtrinsic.isSigned).toBeTruthy();
-            const anotherAccountAddress = await wallet.addAccount();
-            const testExtrinsic2 = new Extrinsic('0x010200ea51b75b00000000');
-            await wallet.sign(testExtrinsic2, anotherAccountAddress, {nonce: 0, blockHash: GENESIS_HASH});
-            expect(testExtrinsic2.isSigned).toBeTruthy();
+            await expect(wallet.signRaw(testPayload(alice.address))).resolves.toBeDefined();
         });
         it('the signer is not in the wallet', async () => {
-            await expect(
-                wallet.sign(testExtrinsic, bob.address(), {nonce: 0, blockHash: GENESIS_HASH})
-            ).rejects.toThrow();
+            await expect(wallet.signRaw(testPayload(alice.address))).rejects.toThrow();
         });
     });
 
@@ -199,9 +211,7 @@ describe('a wallet', () => {
                 await wallet.lock();
                 expect(wallet.isLocked()).toBeTruthy();
                 await expect(wallet.getAddresses()).rejects.toThrow();
-                await expect(
-                    wallet.sign(testExtrinsic, alice.address(), {nonce: 0, blockHash: GENESIS_HASH})
-                ).rejects.toThrow();
+                await expect(wallet.signRaw(testPayload(alice.address))).rejects.toThrow();
             });
             it('can not unlock again', async () => {
                 await expect(wallet.unlock(walletPassphase)).rejects.toThrow('Wallet has already been unlocked');
@@ -216,7 +226,7 @@ describe('a wallet', () => {
                 await wallet.unlock(walletPassphase);
                 expect(wallet.isLocked()).not.toBeTruthy();
                 await expect(wallet.getAddresses()).resolves.toHaveLength(13);
-                await expect(wallet.sign(testExtrinsic, alice.address(), {nonce: 0, blockHash: GENESIS_HASH})).resolves;
+                await expect(wallet.signRaw(testPayload(alice.address))).resolves;
             });
             it('can not add key pair', async () => {
                 const keyring = new SimpleKeyring();
@@ -227,20 +237,24 @@ describe('a wallet', () => {
                 await expect(wallet.getAddresses()).rejects.toThrow('wallet is locked');
             });
             it('can not remove key pair', async () => {
-                await expect(wallet.removeAccount(alice.address())).rejects.toThrow('wallet is locked');
+                await expect(wallet.removeAccount(alice.address)).rejects.toThrow('wallet is locked');
             });
             it('can not sign tx', async () => {
-                await expect(
-                    wallet.sign(testExtrinsic, alice.address(), {nonce: 0, blockHash: GENESIS_HASH})
-                ).rejects.toThrow('wallet is locked');
+                await expect(wallet.signRaw(testPayload(alice.address))).rejects.toThrow('wallet is locked');
             });
         });
     });
 
     describe('export', () => {
+        beforeEach(async () => {
+            const keyring = new SimpleKeyring();
+            await keyring.addPair(alice);
+            await wallet.addKeyring(keyring);
+        });
+
         it('all keyrings', async () => {
             const result = await wallet.export(walletPassphase);
-            expect(result).toHaveLength(1);
+            expect(result).toHaveLength(2);
             expect(result[0].data).toHaveProperty('mnemonic');
             expect(result[0].data).toHaveProperty('hdPath');
             expect(result[0].data).toHaveProperty('numberOfAccounts');

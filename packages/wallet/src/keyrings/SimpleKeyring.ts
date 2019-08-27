@@ -1,14 +1,24 @@
 // Copyright 2019 Centrality Investments Limited
-// Licensed under the Apache license, Version 2.0 (the "license"); you may not use this file except in compliance with the license.
-// You may obtain a copy of the license at http://www.apache.org/licences/LICENCE-2.0.
-// Unless required by applicable law or agreed to in writing, software distributed under the licence is distributed on an "AS IS" BASIS,  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the licence for the specific language governing permissions and limitations under the licence.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 import {Keyring} from '@plugnet/keyring';
 import {KeyringPair, KeyringPair$Json, KeyringPair$Meta} from '@plugnet/keyring/types';
+import {mnemonicGenerate} from '@plugnet/util-crypto';
 import {KeypairType} from '@plugnet/util-crypto/types';
-import {generateMnemonic} from 'bip39';
+
 import {DEFAULT_KEYRING_TYPE} from '../constants';
+import {waitForCryptoReady} from '../decorators';
 import {IKeyring} from '../types';
 
 type SerializedSimpleKeyring = KeyringPair$Json[];
@@ -17,9 +27,11 @@ type SerializedSimpleKeyring = KeyringPair$Json[];
  * a Simple Keyring implementation of ${IKeyring} can be used to manage individual key pairs
  */
 export class SimpleKeyring implements IKeyring<SerializedSimpleKeyring> {
+    @waitForCryptoReady
     static async generate(): Promise<SimpleKeyring> {
         return new SimpleKeyring();
     }
+
     private _keyring = new Keyring({type: DEFAULT_KEYRING_TYPE});
 
     constructor(opt?: SerializedSimpleKeyring) {
@@ -32,16 +44,18 @@ export class SimpleKeyring implements IKeyring<SerializedSimpleKeyring> {
         return (await this.getPairs()).map(pair => pair.toJson());
     }
 
+    @waitForCryptoReady
     async deserialize(data: SerializedSimpleKeyring): Promise<this> {
         this._deserialize(data);
         return this;
     }
 
+    @waitForCryptoReady
     async addPair(pair?: KeyringPair): Promise<KeyringPair> {
         if (pair === undefined) {
-            return this._keyring.addFromMnemonic(generateMnemonic());
+            return this._keyring.addFromMnemonic(mnemonicGenerate());
         } else {
-            if (pair.isLocked()) {
+            if (pair.isLocked) {
                 throw new Error('key pair is locked. unlock before add it into wallet');
             }
             return this._keyring.addPair(pair);
@@ -49,7 +63,7 @@ export class SimpleKeyring implements IKeyring<SerializedSimpleKeyring> {
     }
 
     async getAddresses(): Promise<string[]> {
-        return this._keyring.getPairs().map(kp => kp.address());
+        return this._keyring.getPairs().map(kp => kp.address);
     }
 
     async getPair(address: string): Promise<KeyringPair> {

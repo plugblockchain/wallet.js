@@ -1,28 +1,36 @@
 // Copyright 2019 Centrality Investments Limited
-// Licensed under the Apache license, Version 2.0 (the "license"); you may not use this file except in compliance with the license.
-// You may obtain a copy of the license at http://www.apache.org/licences/LICENCE-2.0.
-// Unless required by applicable law or agreed to in writing, software distributed under the licence is distributed on an "AS IS" BASIS,  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the licence for the specific language governing permissions and limitations under the licence.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import {cryptoWaitReady} from '@plugnet/util-crypto';
 
 import 'reflect-metadata';
-
-// type Newable<T> = {
-//     name: string;
-//     new (...args: any[]): T;
-// };
 
 /**
  *
  * @ignore
  */
-// export function isTypePromise(type: Newable<any>): boolean {
-//     try {
-//         const test = new type(() => ({}));
-//         return test.then && typeof test.then === 'function';
-//     } catch (e) {
-//         return false;
-//     }
-// }
+export const waitForCryptoReady = (
+    target: Object,
+    propertyKey: string | symbol,
+    descriptor: TypedPropertyDescriptor<(...args) => Promise<any>>
+) => {
+    const origin = descriptor.value;
+    descriptor.value = async function(...args) {
+        await cryptoWaitReady();
+        return origin.apply(this, args);
+    };
+};
 
 /**
  *

@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Keyring} from '@plugnet/keyring';
-import {KeyringPair, KeyringPair$Json, KeyringPair$Meta} from '@plugnet/keyring/types';
-import {mnemonicGenerate} from '@plugnet/util-crypto';
-import {KeypairType} from '@plugnet/util-crypto/types';
+import {Keyring} from '@polkadot/keyring';
+import {KeyringPair, KeyringPair$Json, KeyringPair$Meta} from '@polkadot/keyring/types';
+import {mnemonicGenerate} from '@polkadot/util-crypto';
+import {KeypairType} from '@polkadot/util-crypto/types';
 
 import {DEFAULT_KEYRING_TYPE} from '../constants';
 import {waitForCryptoReady} from '../decorators';

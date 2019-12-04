@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {KeyringPair$Json} from '@plugnet/keyring/types';
-import {hexToU8a, u8aToHex, u8aToU8a} from '@plugnet/util';
+import {KeyringPair$Json} from '@polkadot/keyring/types';
+import {hexToU8a, u8aToHex, u8aToU8a} from '@polkadot/util';
 import {persistBeforeReturn, requireUnlocked, synchronized, waitForCryptoReady} from './decorators';
 import naclEncryptor from './encryptors/naclEncryptor';
 import {HDKeyring} from './keyrings/HDKeyring';

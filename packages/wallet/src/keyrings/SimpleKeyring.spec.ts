@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {hexToU8a} from '@plugnet/util';
-import {cryptoWaitReady} from '@plugnet/util-crypto';
-import TestingPairs from '@plugnet/keyring/testingPairs';
+import {hexToU8a} from '@polkadot/util';
+import {cryptoWaitReady} from '@polkadot/util-crypto';
+import TestingPairs from '@polkadot/keyring/testingPairs';
 import {SimpleKeyring} from './SimpleKeyring';
 
 const TESTING_PAIRS = TestingPairs();

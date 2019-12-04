@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {KeyringPair} from '@plugnet/keyring/types';
-import {cryptoWaitReady} from '@plugnet/util-crypto';
+import {KeyringPair} from '@polkadot/keyring/types';
+import {cryptoWaitReady} from '@polkadot/util-crypto';
 import {HDKeyring} from './HDKeyring';
 import {IKeyring} from '../types';
 

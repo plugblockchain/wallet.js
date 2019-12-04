@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {KeyringPair} from '@plugnet/keyring/types';
+import {KeyringPair} from '@polkadot/keyring/types';
 
 export interface IWallet {
     lock(): Promise<void>;

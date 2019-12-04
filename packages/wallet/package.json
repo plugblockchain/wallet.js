@@ -19,11 +19,12 @@
         "test": "echo \"Error: run tests from root\" && exit 1"
     },
     "dependencies": {
-        "@plugnet/keyring": "^1.1.100",
-        "@plugnet/util": "^1.1.100",
+        "@polkadot/keyring": "^1.6.1",
+        "@polkadot/util": "^1.6.1",
         "bip39": "^2.6.0",
         "hdkey": "^1.1.1",
         "reflect-metadata": "^0.1.13",
-        "tweetnacl": "^1.0.1"
+        "tweetnacl": "^1.0.1",
+        "@babel/runtime": "^7.7.4"
     }
 }

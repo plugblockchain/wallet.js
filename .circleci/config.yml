@@ -1,0 +1,16 @@
+version: 2.0
+jobs:
+  build:
+    docker:
+      - image: circleci/node:10.13.0
+    steps:
+      - checkout
+      - run:
+          name: install
+          command: yarn
+      - run:
+          name: lint
+          command: yarn lint
+      - run:
+          name: test
+          command: yarn test

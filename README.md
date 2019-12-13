@@ -1,4 +1,5 @@
 # `@plugnet/wallet`
+[![CircleCI](https://circleci.com/gh/plugblockchain/wallet.js.svg?style=svg)](https://circleci.com/gh/plugblockchain/wallet.js)  
 
 > a wallet and raw payload signer implementation for plugnet
 

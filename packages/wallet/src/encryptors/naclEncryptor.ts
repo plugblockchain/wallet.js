@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {hexToU8a, stringToU8a, u8aFixLength, u8aToHex, u8aToString} from '@plugnet/util';
+import {hexToU8a, stringToU8a, u8aFixLength, u8aToHex, u8aToString} from '@polkadot/util';
 import {randomBytes, secretbox} from 'tweetnacl';
 
 const newNonce = () => randomBytes(secretbox.nonceLength);

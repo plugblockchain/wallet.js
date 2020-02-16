@@ -100,6 +100,8 @@ export class Wallet implements RawPayloadSigner, IWallet {
         const {address, data} = payload;
         const signerPair = await getKeyringByAddress(this, this._accountKeyringMap, address).getPair(address);
         const signature = u8aToHex(signerPair.sign(hexToU8a(data)));
+        // tslint:disable-next-line:no-console
+        console.log('TEST.. if this executed..');
 
         return {
             id: ++id,

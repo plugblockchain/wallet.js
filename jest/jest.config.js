@@ -7,7 +7,7 @@ module.exports = {
     testMatch: ['/**/?(*.)+(spec|e2e).[jt]s?(x)'],
     testEnvironment: 'node',
     collectCoverageFrom: [
-        'packages/wallet/src/**/*.[jt]s?(x)',
+        'src/**/*.[jt]s?(x)',
         '!**/node_modules/**'
     ],
     coverageReporters: ['json', 'html'],
@@ -21,10 +21,10 @@ module.exports = {
     },
     testEnvironment: './jest/env.js',
     moduleNameMapper: {
-        '@plugnet/wallet(.*)$': '<rootDir>/packages/wallet/src/$1'
+        '@plugnet/wallet(.*)$': '<rootDir>/src/$1'
     },
     modulePathIgnorePatterns: [
-        '<rootDir>/packages/wallet/build',
+        '<rootDir>/build',
     ],
     setupFilesAfterEnv: ['./jest/jest.setup.js']
 };

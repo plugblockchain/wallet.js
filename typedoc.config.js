@@ -13,7 +13,7 @@ module.exports = {
   "excludeExternals": false,
   "externalPattern": "**/node_modules/**",
   "external-modulemap": [
-    ["@plugnet/wallet", ".*packages\/wallet\/.*", "packages/wallet/README.md"],
+    ["@plugnet/wallet", "src/.*", "packages/wallet/README.md"],
     ["@plugnet", ".*\/@plugnet\/.*"]
   ],
   "excludePrivate": true,

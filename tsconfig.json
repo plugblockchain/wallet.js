@@ -16,10 +16,10 @@
         "sourceMap": true,
         "inlineSources": true,
         "paths": {
-            "@plugnet/wallet/*": ["packages/wallet/src/*"],
-            "@plugnet/wallet": ["packages/wallet/src/index"]
+            "@plugnet/wallet/*": ["src/*"],
+            "@plugnet/wallet": ["src/index"]
         }
     },
-    "include": ["packages/**/*", "scripts/*.ts"],
+    "include": ["src/**/*", "scripts/*.ts"],
     "exclude": ["**/node_modules/**"]
 }

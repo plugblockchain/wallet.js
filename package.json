@@ -1,37 +1,52 @@
 {
-  "name": "root",
-  "private": true,
-  "engines": {
-    "node": "^10.13.0",
-    "yarn": "^1.12.3"
-  },
-  "workspaces": [
-    "packages/*"
-  ],
-  "scripts": {
-    "build": "polkadot-dev-build-ts",
-    "test": "jest -c ./jest/jest.config.js --coverage spec",
-    "lint": "npx tslint -c tslint.json --project . && npx prettier --list-different './packages/**/src/*.ts'"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.7.4",
-    "@babel/preset-env": "^7.0.0-beta.47",
-    "@polkadot/dev": "^0.31.1",
-    "@polkadot/ts": "^0.1.86",
-    "@types/jest": "^24.0.15",
-    "cz-lerna-changelog": "^2.0.2",
-    "husky": "^2.7.0",
-    "jest": "24.8.0",
-    "jest-environment-node": "^24.0.0",
-    "lerna": "^3.13.1",
-    "prettier": "^1.13.5",
-    "pretty-quick": "^1.11.1",
-    "tslint": "^5.14.0",
-    "ts-jest": "^24.0.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged --pattern 'packages/**/src/**/*' && npx tslint -c tslint.json --project ."
+    "name": "@plugnet/wallet",
+    "version": "0.20.0",
+    "description": "wallet implementation for Plugnet",
+    "author": "ian.he <ian.he@centrality.ai>",
+    "homepage": "https://github.com/plugblockchain/wallet.js#readme",
+    "license": "Apache-2.0",
+    "keywords": [
+        "Plugnet",
+        "wallet"
+    ],
+    "main": "index.js",
+    "types": "index.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com:plugblockchain/wallet.js.git"
+    },
+    "scripts": {
+        "build": "rm -rf build && tsc",
+        "test": "jest -c ./jest/jest.config.js --coverage spec",
+        "lint": "npx tslint -c tslint.json --project . && npx prettier --list-different './src/*.ts'"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.7.4",
+        "@babel/preset-env": "^7.0.0-beta.47",
+        "@polkadot/dev": "^0.31.1",
+        "@polkadot/ts": "^0.1.86",
+        "@types/jest": "^24.0.15",
+        "cz-lerna-changelog": "^2.0.2",
+        "husky": "^2.7.0",
+        "jest": "24.8.0",
+        "jest-environment-node": "^24.0.0",
+        "prettier": "^1.13.5",
+        "pretty-quick": "^1.11.1",
+        "tslint": "^5.14.0",
+        "ts-jest": "^24.0.0"
+    },
+    "dependencies": {
+        "@polkadot/keyring": "^2.2.1",
+        "@polkadot/util": "^2.2.1",
+        "bip39": "^2.6.0",
+        "hdkey": "^1.1.1",
+        "reflect-metadata": "^0.1.13",
+        "tweetnacl": "^1.0.1",
+        "@babel/runtime": "^7.7.4"
+    },
+    "husky": {
+        "hooks": {
+          "pre-commit": "pretty-quick --staged --pattern 'packages/**/src/**/*' && npx tslint -c tslint.json --project ."
+        }
     }
-  }
 }
